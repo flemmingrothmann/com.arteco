@@ -12,8 +12,8 @@
     "no": "Arteco"
   },
   "description": {
-    "en": "Monitor your plants' soil moisture, temperature, humidity, and light with the Arteco ZS-301Z Zigbee sensor.",
-    "no": "Overvåk jordfuktighet, temperatur, luftfuktighet og lys for plantene dine med Arteco ZS-301Z Zigbee-sensor."
+    "en": "Keep your plants happy with Homey.",
+    "no": "Hold plantene dine glade med Homey."
   },
   "category": [
     "climate"
