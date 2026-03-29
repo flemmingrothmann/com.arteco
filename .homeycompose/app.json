@@ -1,6 +1,6 @@
 {
   "id": "com.arteco",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "compatibility": ">=12.4.0",
   "sdk": 3,
   "platforms": [
@@ -37,7 +37,29 @@
     "url": "https://github.com/philipostli/com.arteco/blob/main/CONTRIBUTING.md"
   },
   "tags": {
-    "en": ["plant", "soil", "moisture", "sensor", "zigbee", "tuya", "fertility", "temperature", "humidity", "light"],
-    "no": ["plante", "jord", "fuktighet", "sensor", "zigbee", "tuya", "næringssalt", "temperatur", "luftfuktighet", "lys"]
+    "en": [
+      "plant",
+      "soil",
+      "moisture",
+      "sensor",
+      "zigbee",
+      "tuya",
+      "fertility",
+      "temperature",
+      "humidity",
+      "light"
+    ],
+    "no": [
+      "plante",
+      "jord",
+      "fuktighet",
+      "sensor",
+      "zigbee",
+      "tuya",
+      "næringssalt",
+      "temperatur",
+      "luftfuktighet",
+      "lys"
+    ]
   }
 }
