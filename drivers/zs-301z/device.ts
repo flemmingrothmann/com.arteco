@@ -213,6 +213,12 @@ module.exports = class ZS301ZDevice extends ZigBeeDevice {
           if (this.hasCapability('measure_soil_moisture')) {
             this.setCapabilityValue('measure_soil_moisture', soilMoisture).catch(this.error);
           }
+          if (this.hasCapability('alarm_water')) {
+            const threshold = this.getSetting('soil_warning') ?? DEFAULTS.SOIL_WARNING_PERCENT;
+            const alarm = soilMoisture < threshold;
+            this.log(`Setting water alarm to ${alarm} (moisture ${soilMoisture}% vs threshold ${threshold}%)`);
+            this.setCapabilityValue('alarm_water', alarm).catch(this.error);
+          }
         }
         break;
 
