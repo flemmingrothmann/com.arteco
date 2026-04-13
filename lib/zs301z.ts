@@ -1,6 +1,6 @@
 'use strict';
 
-import { clampNumber, clampInt } from './utils';
+import { clampInt } from './utils';
 
 export function clampSamplingSeconds(seconds: number): number {
   return clampInt(seconds, 5, 3600);

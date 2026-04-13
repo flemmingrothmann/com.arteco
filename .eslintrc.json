@@ -1,10 +1,21 @@
 {
   "extends": "athom/homey-app",
+  "parserOptions": {
+    "project": "./tsconfig.eslint.json"
+  },
+  "rules": {
+    "linebreak-style": "off"
+  },
   "overrides": [
     {
-      "files": ["drivers/**/*.ts", "lib/**/*.ts"],
+      "files": ["app.ts", "drivers/**/*.ts", "lib/**/*.ts"],
       "rules": {
         "@typescript-eslint/no-explicit-any": "off",
+        "default-case": "off",
+        "object-curly-newline": "off",
+        "key-spacing": "off",
+        "no-multi-spaces": "off",
+        "import/prefer-default-export": "off",
         "import/no-unresolved": "off",
         "import/extensions": "off",
         "node/no-missing-import": "off"

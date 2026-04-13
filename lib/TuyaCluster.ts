@@ -87,16 +87,18 @@ class TuyaSpecificCluster extends Cluster {
   // Send a datapoint command to the device
   async sendDatapoint(dp: number, datatype: number, data: Buffer) {
     const transid = Math.floor(Math.random() * 255);
-    // Use the dynamically created datapoint method from COMMANDS
-    // disableDefaultResponse: true to avoid waiting for a response that may not come
-    return this.datapoint({
-      status: 0,
-      transid,
-      dp,
-      datatype,
-      length: data.length,
+
+    const payload = Buffer.concat([
+      Buffer.from([0, transid, dp, datatype]),
+      Buffer.from([(data.length >> 8) & 0xff, data.length & 0xff]),
       data,
-    }, { disableDefaultResponse: true });
+    ]);
+
+    return this.sendFrame({
+      frameControl: ['clusterSpecific', 'disableDefaultResponse'],
+      cmdId: 0x00,
+      data: payload,
+    });
   }
 
   // Helper to send a boolean value

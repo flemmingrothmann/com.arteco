@@ -64,6 +64,61 @@
           "hint": "Fuktighetsnivå under hvilken tørkealarm utløses (0–100 %)."
         }
       }
+    },
+    "zs-304z": {
+      "name": "ZS-304Z Jordsensor",
+      "capabilities": {
+        "measure_soil_moisture": {
+          "name": "Jordfuktighet",
+          "title": "Jordfuktighet"
+        },
+        "measure_temperature": {
+          "name": "Temperatur",
+          "title": "Temperatur"
+        },
+        "measure_humidity": {
+          "name": "Luftfuktighet",
+          "title": "Luftfuktighet"
+        },
+        "measure_luminance": {
+          "name": "Lysintensitet",
+          "title": "Lysintensitet"
+        },
+        "measure_battery": {
+          "name": "Batteri",
+          "title": "Batteri"
+        },
+        "alarm_water": {
+          "name": "Tørkealarm",
+          "title": "Tørkealarm"
+        }
+      },
+      "settings": {
+        "temperature_calibration": {
+          "label": "Temperaturkalibrering",
+          "hint": "Avvik i °C (-2,0 til +2,0). Trer i kraft ved neste rapport."
+        },
+        "humidity_calibration": {
+          "label": "Luftfuktighetskalibrering",
+          "hint": "Avvik for å justere luftfuktighetsavlesning (-30 til +30)."
+        },
+        "soil_calibration": {
+          "label": "Jordfuktighetskalibrering",
+          "hint": "Avvik for å justere jordfuktighetsavlesning (-30 til +30)."
+        },
+        "illuminance_calibration": {
+          "label": "Lyskalibrering",
+          "hint": "Avvik for å justere lysavlesning (-1000 til +1000 lx)."
+        },
+        "soil_sampling": {
+          "label": "Jordmålingsintervall",
+          "hint": "Hvor ofte sensoren måler jordfuktighet (5–3600 sekunder). Trer i kraft ved neste rapport."
+        },
+        "soil_warning": {
+          "label": "Tørkegrense for jord",
+          "hint": "Fuktighetsnivå under hvilken tørkealarm utløses (0–100 %)."
+        }
+      }
     }
   }
 }

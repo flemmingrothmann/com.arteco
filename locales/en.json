@@ -64,6 +64,61 @@
           "hint": "Moisture percentage below which the water shortage alarm triggers (0–100 %)."
         }
       }
+    },
+    "zs-304z": {
+      "name": "ZS-304Z Soil Sensor",
+      "capabilities": {
+        "measure_soil_moisture": {
+          "name": "Soil Moisture",
+          "title": "Soil Moisture"
+        },
+        "measure_temperature": {
+          "name": "Temperature",
+          "title": "Temperature"
+        },
+        "measure_humidity": {
+          "name": "Air Humidity",
+          "title": "Air Humidity"
+        },
+        "measure_luminance": {
+          "name": "Light Intensity",
+          "title": "Light Intensity"
+        },
+        "measure_battery": {
+          "name": "Battery",
+          "title": "Battery"
+        },
+        "alarm_water": {
+          "name": "Water Shortage Alarm",
+          "title": "Water Shortage Alarm"
+        }
+      },
+      "settings": {
+        "temperature_calibration": {
+          "label": "Temperature Calibration",
+          "hint": "Offset in °C (-2.0 to +2.0). Takes effect on next report."
+        },
+        "humidity_calibration": {
+          "label": "Humidity Calibration",
+          "hint": "Offset to adjust humidity readings (-30 to +30)."
+        },
+        "soil_calibration": {
+          "label": "Soil Moisture Calibration",
+          "hint": "Offset to adjust soil moisture readings (-30 to +30)."
+        },
+        "illuminance_calibration": {
+          "label": "Illuminance Calibration",
+          "hint": "Offset to adjust illuminance readings (-1000 to +1000 lx)."
+        },
+        "soil_sampling": {
+          "label": "Soil Sampling Interval",
+          "hint": "How often the sensor measures soil moisture (5–3600 seconds). Takes effect on next report."
+        },
+        "soil_warning": {
+          "label": "Soil Dryness Threshold",
+          "hint": "Moisture percentage below which the water shortage alarm triggers (0–100 %)."
+        }
+      }
     }
   }
 }
