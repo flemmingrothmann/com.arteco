@@ -2,7 +2,8 @@
   "type": "number",
   "title": {
     "en": "Soil Moisture",
-    "no": "Jordfuktighet"
+    "no": "Jordfuktighet",
+    "da": "Fugt"
   },
   "icon": "/assets/measure_soil_moisture.svg",
   "getable": true,
@@ -10,7 +11,8 @@
   "insights": true,
   "units": {
     "en": "%",
-    "no": "%"
+    "no": "%",
+    "da": "%"
   },
   "min": 0,
   "max": 100

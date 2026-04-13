@@ -1,0 +1,124 @@
+{
+  "capabilities": {
+    "measure_soil_moisture": {
+      "name": "Fugt",
+      "title": "Fugt"
+    },
+    "measure_soil_fertility": {
+      "name": "Jordnæring",
+      "title": "Jordnæring"
+    }
+  },
+  "drivers": {
+    "zs-301z": {
+      "name": "ZS-301Z Jordsensor",
+      "capabilities": {
+        "measure_soil_moisture": {
+          "name": "Fugt",
+          "title": "Fugt"
+        },
+        "measure_soil_fertility": {
+          "name": "Jordnæring",
+          "title": "Jordnæring"
+        },
+        "measure_temperature": {
+          "name": "Temperatur",
+          "title": "Temperatur"
+        },
+        "measure_humidity": {
+          "name": "Luftfugtighed",
+          "title": "Luftfugtighed"
+        },
+        "measure_luminance": {
+          "name": "Lysintensitet",
+          "title": "Lysintensitet"
+        },
+        "measure_battery": {
+          "name": "Batteri",
+          "title": "Batteri"
+        },
+        "alarm_water": {
+          "name": "Tørkealarm",
+          "title": "Tørkealarm"
+        }
+      },
+      "settings": {
+        "temperature_calibration": {
+          "label": "Temperaturkalibrering",
+          "hint": "Offset i °C (-2,0 til +2,0). Træder i kraft ved næste rapport."
+        },
+        "humidity_calibration": {
+          "label": "Luftfugtighedskalibrering",
+          "hint": "Offset til justering af luftfugtighedsmålinger (-30 til +30)."
+        },
+        "soil_calibration": {
+          "label": "Fugtkalibrering",
+          "hint": "Offset til justering af fugtmålinger (-30 til +30)."
+        },
+        "soil_sampling": {
+          "label": "Jordmålingsinterval",
+          "hint": "Hvor ofte sensoren måler fugt (5-3600 sekunder). Træder i kraft ved næste rapport."
+        },
+        "soil_warning": {
+          "label": "Tørkegrænse for jord",
+          "hint": "Fugtighedsniveau under hvilket tørkealarmen udløses (0-100 %)."
+        }
+      }
+    },
+    "zs-304z": {
+      "name": "ZS-304Z Jordsensor",
+      "capabilities": {
+        "measure_soil_moisture": {
+          "name": "Fugt",
+          "title": "Fugt"
+        },
+        "measure_temperature": {
+          "name": "Temperatur",
+          "title": "Temperatur"
+        },
+        "measure_humidity": {
+          "name": "Luftfugtighed",
+          "title": "Luftfugtighed"
+        },
+        "measure_luminance": {
+          "name": "Lysintensitet",
+          "title": "Lysintensitet"
+        },
+        "measure_battery": {
+          "name": "Batteri",
+          "title": "Batteri"
+        },
+        "alarm_water": {
+          "name": "Tørkealarm",
+          "title": "Tørkealarm"
+        }
+      },
+      "settings": {
+        "temperature_calibration": {
+          "label": "Temperaturkalibrering",
+          "hint": "Offset i °C (-2,0 til +2,0). Træder i kraft ved næste rapport."
+        },
+        "humidity_calibration": {
+          "label": "Luftfugtighedskalibrering",
+          "hint": "Offset til justering af luftfugtighedsmålinger (-30 til +30)."
+        },
+        "soil_calibration": {
+          "label": "Fugtkalibrering",
+          "hint": "Offset til justering af fugtmålinger (-30 til +30)."
+        },
+        "illuminance_calibration": {
+          "label": "Lyskalibrering",
+          "hint": "Offset til justering af lysmålinger (-1000 til +1000 lx)."
+        },
+        "soil_sampling": {
+          "label": "Jordmålingsinterval",
+          "hint": "Hvor ofte sensoren måler fugt (5-3600 sekunder). Træder i kraft ved næste rapport."
+        },
+        "soil_warning": {
+          "label": "Tørkegrænse for jord",
+          "hint": "Fugtighedsniveau under hvilket tørkealarmen udløses (0-100 %)."
+        }
+      }
+    }
+  }
+}

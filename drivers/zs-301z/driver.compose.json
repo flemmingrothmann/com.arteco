@@ -2,7 +2,8 @@
   "id": "zs-301z",
   "name": {
     "en": "ZS-301Z Soil Sensor",
-    "no": "ZS-301Z Jordsensor"
+    "no": "ZS-301Z Jordsensor",
+    "da": "ZS-301Z Jordsensor"
   },
   "class": "sensor",
   "platforms": [
@@ -30,19 +31,22 @@
     "measure_temperature": {
       "title": {
         "en": "Temperature",
-        "no": "Temperatur"
+        "no": "Temperatur",
+        "da": "Temperatur"
       }
     },
     "measure_humidity": {
       "title": {
         "en": "Air Humidity",
-        "no": "Luftfuktighet"
+        "no": "Luftfuktighet",
+        "da": "Luftfugtighed"
       }
     },
     "alarm_water": {
       "title": {
         "en": "Water Shortage Alarm",
-        "no": "Tørkealarm"
+        "no": "Tørkealarm",
+        "da": "Tørkealarm"
       }
     }
   },
@@ -75,11 +79,13 @@
       "type": "number",
       "label": {
         "en": "Temperature Calibration",
-        "no": "Temperaturkalibrering"
+        "no": "Temperaturkalibrering",
+        "da": "Temperaturkalibrering"
       },
       "hint": {
         "en": "Offset in °C (-2.0 to +2.0). Takes effect on next report.",
-        "no": "Avvik i °C (-2,0 til +2,0). Trer i kraft ved neste rapport."
+        "no": "Avvik i °C (-2,0 til +2,0). Trer i kraft ved neste rapport.",
+        "da": "Offset i °C (-2,0 til +2,0). Træder i kraft ved næste rapport."
       },
       "min": -2,
       "max": 2,
@@ -90,11 +96,13 @@
       "type": "number",
       "label": {
         "en": "Humidity Calibration",
-        "no": "Luftfuktighetskalibrering"
+        "no": "Luftfuktighetskalibrering",
+        "da": "Luftfugtighedskalibrering"
       },
       "hint": {
         "en": "Offset to adjust humidity readings (-30 to +30)",
-        "no": "Avvik for å justere luftfuktighetsavlesning (-30 til +30)"
+        "no": "Avvik for å justere luftfuktighetsavlesning (-30 til +30)",
+        "da": "Offset til justering af luftfugtighedsmålinger (-30 til +30)"
       },
       "min": -30,
       "max": 30,
@@ -105,11 +113,13 @@
       "type": "number",
       "label": {
         "en": "Soil Moisture Calibration",
-        "no": "Jordfuktighetskalibrering"
+        "no": "Jordfuktighetskalibrering",
+        "da": "Fugtkalibrering"
       },
       "hint": {
         "en": "Offset to adjust soil moisture readings (-30 to +30)",
-        "no": "Avvik for å justere jordfuktighetsavlesning (-30 til +30)"
+        "no": "Avvik for å justere jordfuktighetsavlesning (-30 til +30)",
+        "da": "Offset til justering af fugtmålinger (-30 til +30)"
       },
       "min": -30,
       "max": 30,
@@ -120,18 +130,21 @@
       "type": "number",
       "label": {
         "en": "Soil Sampling Interval",
-        "no": "Jordmålingsintervall"
+        "no": "Jordmålingsintervall",
+        "da": "Jordmålingsinterval"
       },
       "hint": {
         "en": "How often the sensor measures soil moisture (5-3600 seconds)",
-        "no": "Hvor ofte sensoren måler jordfuktighet (5–3600 sekunder)"
+        "no": "Hvor ofte sensoren måler jordfuktighet (5–3600 sekunder)",
+        "da": "Hvor ofte sensoren måler fugt (5-3600 sekunder)"
       },
       "min": 5,
       "max": 3600,
       "value": 600,
       "units": {
         "en": "seconds",
-        "no": "sekunder"
+        "no": "sekunder",
+        "da": "sekunder"
       }
     },
     {
@@ -139,18 +152,21 @@
       "type": "number",
       "label": {
         "en": "Soil Dryness Threshold",
-        "no": "Tørkegrense for jord"
+        "no": "Tørkegrense for jord",
+        "da": "Tørkegrænse for jord"
       },
       "hint": {
         "en": "Moisture percentage below which water alarm triggers (0-100%)",
-        "no": "Fuktighetsnivå under hvilken tørkealarm utløses (0–100 %)"
+        "no": "Fuktighetsnivå under hvilken tørkealarm utløses (0–100 %)",
+        "da": "Fugtighedsniveau under hvilket tørkealarmen udløses (0-100 %)"
       },
       "min": 0,
       "max": 100,
       "value": 30,
       "units": {
         "en": "%",
-        "no": "%"
+        "no": "%",
+        "da": "%"
       }
     }
   ],

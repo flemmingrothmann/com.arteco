@@ -8,11 +8,13 @@
   ],
   "name": {
     "en": "Arteco",
-    "no": "Arteco"
+    "no": "Arteco",
+    "da": "Arteco"
   },
   "description": {
     "en": "Keep your plants happy with Homey.",
-    "no": "Hold plantene dine glade med Homey."
+    "no": "Hold plantene dine glade med Homey.",
+    "da": "Hold dine planter glade med Homey."
   },
   "category": [
     "climate"
@@ -59,6 +61,18 @@
       "næringssalt",
       "temperatur",
       "luftfuktighet",
+      "lys"
+    ],
+    "da": [
+      "plante",
+      "jord",
+      "fugt",
+      "sensor",
+      "zigbee",
+      "tuya",
+      "næringssalt",
+      "temperatur",
+      "luftfugtighed",
       "lys"
     ]
   }
