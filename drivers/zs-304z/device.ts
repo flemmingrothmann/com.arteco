@@ -22,6 +22,7 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
   private pendingSettingsApply = false;
   private endpoint1: any = null;
   private lastWakeHandledAt = 0;
+  private lastBatteryPercentage: number | null = null;
 
   async onNodeInit({ zclNode }: { zclNode: any }) {
     this.log('ZS-304Z device initialized');
@@ -235,7 +236,7 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
 
       case 'battery':
         if (typeof value === 'number' && this.hasCapability('measure_battery')) {
-          this.setCapabilityValue('measure_battery', clampPercent(value)).catch(this.error);
+          this.updateBatteryCapability(clampPercent(value), 'tuya').catch(this.error);
         }
         break;
 
@@ -268,11 +269,31 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     try {
       const batteryStatus = await endpoint.clusters[CLUSTER.POWER_CONFIGURATION.NAME].readAttributes(['batteryPercentageRemaining']);
       if (batteryStatus.batteryPercentageRemaining !== undefined && this.hasCapability('measure_battery')) {
-        await this.setCapabilityValue('measure_battery', Math.round(batteryStatus.batteryPercentageRemaining / 2));
+        await this.updateBatteryCapability(Math.round(batteryStatus.batteryPercentageRemaining / 2), 'powerConfiguration');
       }
     } catch (err) {
       this.log('Could not read battery (device may be sleeping):', err);
     }
+  }
+
+  private async updateBatteryCapability(battery: number, source: 'tuya' | 'powerConfiguration'): Promise<void> {
+    const previousBattery = this.lastBatteryPercentage;
+
+    // Tuya DP 14 occasionally reports implausible 0/100 spikes on this device.
+    if (
+      source === 'tuya'
+      && previousBattery !== null
+      && previousBattery >= 10
+      && previousBattery <= 90
+      && (battery === 0 || battery === 100)
+      && Math.abs(battery - previousBattery) >= 40
+    ) {
+      this.log(`Ignoring implausible Tuya battery spike ${battery}% (previous ${previousBattery}%)`);
+      return;
+    }
+
+    this.lastBatteryPercentage = battery;
+    await this.setCapabilityValue('measure_battery', battery);
   }
 
   async onSettings({ newSettings, changedKeys }: {
