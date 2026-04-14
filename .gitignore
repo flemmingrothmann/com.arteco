@@ -15,6 +15,7 @@
 # Editor
 .vscode/
 .idea/
+.vs/
 *.swp
 *~
 

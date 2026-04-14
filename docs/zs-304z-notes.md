@@ -44,11 +44,6 @@ Why:
 - In testing, the device reports individual datapoints in separate Tuya frames.
 - Raw frame decoding gives the clearest and most deterministic view of what the sensor actually sends.
 
-Why not the higher-level Tuya cluster events:
-
-- Using both raw frames and parsed Tuya event listeners caused duplicated datapoint handling.
-- The raw frame path is easier to reason about and debug.
-
 ### `DP 3` is the source for `alarm_water`
 
 Homey `alarm_water` is derived from:
