@@ -22,7 +22,7 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
   private pendingSettingsApply = false;
   private endpoint1: any = null;
   private lastWakeHandledAt = 0;
-  private lastBatteryPercentage: number | null = null;
+  private lastCapabilityValues = new Map<string, boolean | number | string>();
 
   async onNodeInit({ zclNode }: { zclNode: any }) {
     this.log('ZS-304Z device initialized');
@@ -39,6 +39,10 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     }
     this.endpoint1 = endpoint;
 
+    if (!this.hasCapability('alarm_water')) {
+      await this.addCapability('alarm_water').catch(this.error);
+    }
+
     const isSleepy = this.isDeviceSleepy();
     this.log(`Device is ${isSleepy ? 'sleepy (battery-powered)' : 'always-on'}`);
 
@@ -51,16 +55,14 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     this.tuyaCluster = endpoint.clusters['tuya'] || endpoint.clusters[TUYA_CLUSTER_ID];
 
     if (this.tuyaCluster) {
-      this.log('Tuya cluster found');
-      this.setupTuyaListeners();
+      this.log('Tuya cluster found; using raw frame decoding');
     } else {
       this.log('Tuya cluster not found, trying to bind');
       try {
         await endpoint.bind('tuya');
         this.tuyaCluster = endpoint.clusters['tuya'];
         if (this.tuyaCluster) {
-          this.log('Tuya cluster bound successfully');
-          this.setupTuyaListeners();
+          this.log('Tuya cluster bound successfully; using raw frame decoding');
         }
       } catch (err) {
         this.log('Could not bind Tuya cluster:', err);
@@ -106,25 +108,6 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     });
   }
 
-  private setupTuyaListeners() {
-    if (!this.tuyaCluster) return;
-
-    this.tuyaCluster.on('reporting', (args: any) => {
-      this.log('Tuya reporting event:', args);
-      this.processTuyaReport(args);
-    });
-
-    this.tuyaCluster.on('response', (args: any) => {
-      this.log('Tuya response event:', args);
-      this.processTuyaReport(args);
-    });
-
-    this.tuyaCluster.on('datapoint', (args: any) => {
-      this.log('Tuya datapoint event:', args);
-      this.processTuyaReport(args);
-    });
-  }
-
   private registerRawReportHandler(zclNode: any) {
     const endpoint = zclNode.endpoints[1];
     if (!endpoint) return;
@@ -161,15 +144,6 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     }
   }
 
-  private processTuyaReport(args: any) {
-    if (!args) return;
-    this.log('Processing Tuya report:', JSON.stringify(args));
-    const { dp, datatype, data } = args;
-    if (typeof dp === 'number' && data) {
-      this.processDataPoint(dp, datatype || 0, Buffer.isBuffer(data) ? data : Buffer.from([data]));
-    }
-  }
-
   private parseDpValue(datatype: number, data: Buffer): number | boolean {
     switch (datatype) {
       case TuyaDataTypes.BOOL:
@@ -200,12 +174,12 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
       ? rawValue / mapping.divideBy
       : rawValue;
 
-    this.log(`Processing DP ${dp} = ${value} (handler: ${mapping.handler})`);
+    this.log(`Decoded DP ${dp} (${mapping.handler}) type=${datatype} raw=${this.formatDpValue(rawValue)} mapped=${this.formatDpValue(value)}`);
 
     switch (mapping.handler) {
       case 'temperature':
         if (typeof rawValue === 'number' && this.hasCapability('measure_temperature')) {
-          this.setCapabilityValue('measure_temperature', rawTemperatureTimes10ToCelsius(rawValue)).catch(this.error);
+          this.updateCapabilityIfChanged('measure_temperature', rawTemperatureTimes10ToCelsius(rawValue)).catch(this.error);
         }
         break;
 
@@ -213,45 +187,33 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
         if (typeof value === 'number') {
           const soilMoisture = clampPercent(value);
           if (this.hasCapability('measure_soil_moisture')) {
-            this.setCapabilityValue('measure_soil_moisture', soilMoisture).catch(this.error);
+            this.updateCapabilityIfChanged('measure_soil_moisture', soilMoisture).catch(this.error);
           }
           if (this.hasCapability('alarm_water')) {
             const threshold = this.getSetting('soil_warning') ?? DEFAULTS.SOIL_WARNING_PERCENT;
-            this.setCapabilityValue('alarm_water', soilMoisture < threshold).catch(this.error);
+            this.updateCapabilityIfChanged('alarm_water', soilMoisture < threshold).catch(this.error);
           }
         }
         break;
 
       case 'humidity':
         if (typeof value === 'number' && this.hasCapability('measure_humidity')) {
-          this.setCapabilityValue('measure_humidity', clampPercent(value)).catch(this.error);
+          this.updateCapabilityIfChanged('measure_humidity', clampPercent(value)).catch(this.error);
         }
         break;
 
       case 'illuminance':
         if (typeof value === 'number' && this.hasCapability('measure_luminance')) {
-          this.setCapabilityValue('measure_luminance', value).catch(this.error);
+          this.updateCapabilityIfChanged('measure_luminance', value).catch(this.error);
         }
         break;
 
       case 'battery':
-        if (typeof value === 'number' && this.hasCapability('measure_battery')) {
-          this.updateBatteryCapability(clampPercent(value), 'tuya').catch(this.error);
-        }
+        this.log(`DP 14 battery_state=${this.describeBatteryState(value)}`);
         break;
 
       case 'waterWarning': {
-        let alarm: boolean;
-        if (typeof value === 'boolean') {
-          alarm = value;
-        } else if (typeof value === 'number') {
-          alarm = value !== 0;
-        } else {
-          break;
-        }
-        if (this.hasCapability('alarm_water')) {
-          this.setCapabilityValue('alarm_water', alarm).catch(this.error);
-        }
+        this.log(`DP 111 water_warning=${this.describeWaterWarning(value)}`);
         break;
       }
 
@@ -269,31 +231,61 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     try {
       const batteryStatus = await endpoint.clusters[CLUSTER.POWER_CONFIGURATION.NAME].readAttributes(['batteryPercentageRemaining']);
       if (batteryStatus.batteryPercentageRemaining !== undefined && this.hasCapability('measure_battery')) {
-        await this.updateBatteryCapability(Math.round(batteryStatus.batteryPercentageRemaining / 2), 'powerConfiguration');
+        await this.updateBatteryCapability(Math.round(batteryStatus.batteryPercentageRemaining / 2));
       }
     } catch (err) {
       this.log('Could not read battery (device may be sleeping):', err);
     }
   }
 
-  private async updateBatteryCapability(battery: number, source: 'tuya' | 'powerConfiguration'): Promise<void> {
-    const previousBattery = this.lastBatteryPercentage;
+  private async updateBatteryCapability(battery: number): Promise<void> {
+    await this.updateCapabilityIfChanged('measure_battery', battery);
+  }
 
-    // Tuya DP 14 occasionally reports implausible 0/100 spikes on this device.
-    if (
-      source === 'tuya'
-      && previousBattery !== null
-      && previousBattery >= 10
-      && previousBattery <= 90
-      && (battery === 0 || battery === 100)
-      && Math.abs(battery - previousBattery) >= 40
-    ) {
-      this.log(`Ignoring implausible Tuya battery spike ${battery}% (previous ${previousBattery}%)`);
+  private describeBatteryState(value: number | boolean): string {
+    if (typeof value !== 'number') return String(value);
+
+    switch (value) {
+      case 0:
+        return 'low';
+      case 1:
+        return 'middle';
+      case 2:
+        return 'high';
+      default:
+        return `unknown(${value})`;
+    }
+  }
+
+  private describeWaterWarning(value: number | boolean): string {
+    if (typeof value === 'boolean') {
+      return value ? 'alarm' : 'none';
+    }
+
+    switch (value) {
+      case 0:
+        return 'none';
+      case 1:
+        return 'alarm';
+      default:
+        return `unknown(${value})`;
+    }
+  }
+
+  private formatDpValue(value: number | boolean): string {
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    return String(value);
+  }
+
+  private async updateCapabilityIfChanged(capability: string, value: boolean | number | string): Promise<void> {
+    const previousValue = this.lastCapabilityValues.get(capability);
+    if (previousValue === value) {
+      this.log(`Skipping duplicate capability update for ${capability}: ${value}`);
       return;
     }
 
-    this.lastBatteryPercentage = battery;
-    await this.setCapabilityValue('measure_battery', battery);
+    this.lastCapabilityValues.set(capability, value);
+    await this.setCapabilityValue(capability, value);
   }
 
   async onSettings({ newSettings, changedKeys }: {
