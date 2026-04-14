@@ -22,6 +22,7 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
   private pendingSettingsApply = false;
   private endpoint1: any = null;
   private lastWakeHandledAt = 0;
+  private lastFrameSeenAt = 0;
   private lastCapabilityValues = new Map<string, boolean | number | string>();
 
   async onNodeInit({ zclNode }: { zclNode: any }) {
@@ -119,7 +120,7 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
           this.log('Raw Tuya frame received, cluster:', clusterId);
           this.log('Frame data:', frame.toString('hex'));
           this.parseRawTuyaFrame(frame);
-          this.onDeviceAwake().catch(this.error);
+          this.onFrameReceivedWhileAwake().catch(this.error);
         }
         return originalHandleFrame(clusterId, frame, meta);
       };
@@ -336,7 +337,7 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
 
   async onEndDeviceAnnounce(): Promise<void> {
     this.log('Device announced (woke up from sleep)');
-    await this.onDeviceAwake();
+    await this.onDeviceAwake('announce');
   }
 
   private async configureMagicPacket(zclNode: any): Promise<void> {
@@ -363,17 +364,30 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     return (this as any).node?.receiveWhenIdle === false;
   }
 
-  private async onDeviceAwake(): Promise<void> {
+  private async onFrameReceivedWhileAwake(): Promise<void> {
+    const now = Date.now();
+    const NEW_WAKE_SESSION_MS = 15000;
+
+    if (now - this.lastFrameSeenAt < NEW_WAKE_SESSION_MS) {
+      this.lastFrameSeenAt = now;
+      return;
+    }
+
+    this.lastFrameSeenAt = now;
+    await this.onDeviceAwake('raw-frame');
+  }
+
+  private async onDeviceAwake(reason: 'announce' | 'raw-frame'): Promise<void> {
     const now = Date.now();
     const DEBOUNCE_MS = 5000;
 
     if (now - this.lastWakeHandledAt < DEBOUNCE_MS) {
-      this.log('Skipping duplicate wake handling (debounce)');
+      this.log(`Skipping duplicate wake handling (${reason})`);
       return;
     }
     this.lastWakeHandledAt = now;
 
-    this.log('Handling device wake-up');
+    this.log(`Handling device wake-up (${reason})`);
     await this.setAvailable().catch(this.error);
 
     if (this.pendingSettingsApply) {
