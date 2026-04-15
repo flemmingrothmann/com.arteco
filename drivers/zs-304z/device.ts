@@ -42,6 +42,11 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
     if (!this.hasCapability('alarm_water')) {
       await this.addCapability('alarm_water').catch(this.error);
     }
+    if (!this.hasCapability('soil_warning_threshold')) {
+      await this.addCapability('soil_warning_threshold').catch(this.error);
+    }
+
+    this.syncSoilWarningThreshold(this.getSetting('soil_warning') ?? DEFAULTS.SOIL_WARNING_PERCENT).catch(this.error);
 
     const isSleepy = this.isDeviceSleepy();
     this.log(`Device is ${isSleepy ? 'sleepy (battery-powered)' : 'always-on'}`);
@@ -294,6 +299,10 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
   }): Promise<void> {
     this.log('Settings changed:', changedKeys);
 
+    if (changedKeys.includes('soil_warning')) {
+      this.syncSoilWarningThreshold(newSettings.soil_warning).catch(this.error);
+    }
+
     if (this.isDeviceSleepy()) {
       this.log('Device is sleepy - queueing settings for next wake-up');
       this.pendingSettingsApply = true;
@@ -331,6 +340,16 @@ module.exports = class ZS304ZDevice extends ZigBeeDevice {
 
   async onDeleted() {
     this.log('ZS-304Z device deleted');
+  }
+
+  private async syncSoilWarningThreshold(value: unknown): Promise<void> {
+    if (!this.hasCapability('soil_warning_threshold')) {
+      return;
+    }
+
+    const numericValue = typeof value === 'number' ? value : DEFAULTS.SOIL_WARNING_PERCENT;
+    const threshold = clampSoilWarning(numericValue);
+    await this.updateCapabilityIfChanged('soil_warning_threshold', threshold);
   }
 
   async onEndDeviceAnnounce(): Promise<void> {

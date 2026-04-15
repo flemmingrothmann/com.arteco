@@ -20,6 +20,7 @@
   },
   "capabilities": [
     "measure_soil_moisture",
+    "soil_warning_threshold",
     "measure_temperature",
     "measure_humidity",
     "measure_luminance",
@@ -46,6 +47,13 @@
         "en": "Water Shortage Alarm",
         "no": "Tørkealarm",
         "da": "Tørkealarm"
+      }
+    },
+    "soil_warning_threshold": {
+      "title": {
+        "en": "Dry Soil Alarm Threshold",
+        "no": "Tørkegrense for jord",
+        "da": "Jordfugtgrænse"
       }
     }
   },
