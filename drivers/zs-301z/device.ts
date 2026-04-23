@@ -17,6 +17,8 @@ import { DP_HANDLERS, DP_WRITE, DEFAULTS } from '../../lib/zs301zDatapoints';
 
 module.exports = class ZS301ZDevice extends ZigBeeDevice {
 
+  private static readonly SOIL_WARNING_HYSTERESIS = 2;
+
   private tuyaCluster: any = null;
   private pendingSettingsApply = false;
   private endpoint1: any = null;
@@ -215,9 +217,7 @@ module.exports = class ZS301ZDevice extends ZigBeeDevice {
           }
           if (this.hasCapability('alarm_water')) {
             const threshold = this.getSetting('soil_warning') ?? DEFAULTS.SOIL_WARNING_PERCENT;
-            const alarm = soilMoisture < threshold;
-            this.log(`Setting water alarm to ${alarm} (moisture ${soilMoisture}% vs threshold ${threshold}%)`);
-            this.setCapabilityValue('alarm_water', alarm).catch(this.error);
+            this.updateDrySoilAlarm(soilMoisture, threshold).catch(this.error);
           }
         }
         break;
@@ -341,6 +341,27 @@ module.exports = class ZS301ZDevice extends ZigBeeDevice {
 
   async onDeleted() {
     this.log('ZS-301Z device deleted');
+  }
+
+  private async updateDrySoilAlarm(soilMoisture: number, threshold: number): Promise<void> {
+    if (!this.hasCapability('alarm_water')) {
+      return;
+    }
+
+    const currentAlarm = this.getCapabilityValue('alarm_water');
+
+    if (currentAlarm === true) {
+      if (soilMoisture >= threshold + ZS301ZDevice.SOIL_WARNING_HYSTERESIS) {
+        this.log(`Clearing water alarm with hysteresis (moisture ${soilMoisture}% vs threshold ${threshold}%)`);
+        await this.setCapabilityValue('alarm_water', false);
+      }
+      return;
+    }
+
+    if (soilMoisture < threshold) {
+      this.log(`Setting water alarm with hysteresis (moisture ${soilMoisture}% vs threshold ${threshold}%)`);
+      await this.setCapabilityValue('alarm_water', true);
+    }
   }
 
   async onEndDeviceAnnounce(): Promise<void> {
